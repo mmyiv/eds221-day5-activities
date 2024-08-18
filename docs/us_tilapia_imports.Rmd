@@ -1,0 +1,72 @@
+---
+title: "us_tilapia_imports"
+author: "mish"
+date: "2024-08-16"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+us_tilapia_imports <- read_csv(here::here("data", "us_tilapia_imports.csv")) %>% clean_names()
+```
+
+```{r}
+summary(us_tilapia_imports)
+names(us_tilapia_imports)
+head(us_tilapia_imports)
+tail(us_tilapia_imports)
+dim(us_tilapia_imports)
+skimr::skim(us_tilapia_imports)
+```
+
+```{r}
+us_tilapia_imports_long <- us_tilapia_imports %>% 
+  pivot_longer(cols = -country, 
+               names_to = "year", 
+               values_to = "imports")
+
+view(us_tilapia_imports_long)
+
+class(us_tilapia_imports_long$year)
+```
+
+
+```{r}
+us_tilapia_imports_long <- us_tilapia_imports_long %>% dplyr::mutate(year = as.numeric(year))
+
+class(us_tilapia_imports_output$year)
+
+```
+
+```{r}
+yearly_tilapia_tot <- us_tilapia_imports_long %>% 
+  group_by(year) %>% 
+  summarise(total_count = sum(imports, na.rm = TRUE))
+
+yearly_tilapia_tot
+```
+
+```{r}
+ggplot(data = yearly_tilapia_tot, aes(x = year, y = total_count)) + geom_line() + theme_classic() + labs(y = "total count of fish", 
+                                                                                                         title = "Total US Tilapia Imports")
+```
+
+```{r}
+latin_imports_total <- us_tilapia_imports_long %>% 
+  filter(country %in% 
+           c("Ecuador", "Honduras", "Costa Rica", "Mexico")) %>% 
+  group_by(country,year)|>
+  summarize(total_count=sum(imports, na.rm = TRUE))
+
+ggplot(data = latin_imports_total, aes(x = year, y = total_count)) + geom_line(color = "blue") + facet_wrap(~country) + theme_classic() + labs(x = "Year", 
+                                                                                                                                               y = "Total Tilapia Count", 
+                                                                                                                                               title = "Latin Imports of Tilapia")
+```
+

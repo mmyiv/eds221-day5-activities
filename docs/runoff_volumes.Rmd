@@ -1,0 +1,35 @@
+---
+title: "runoff_volumes"
+author: "mish"
+date: "2024-08-16"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+source(here::here("src", "storm_runoff.R"))
+```
+
+```{r}
+iA_seq <- seq(from = 0.6, to = 0.8, by = 0.01)
+
+predict_runoff(iA_seq, 182)
+```
+```{r}
+predict_runoff_df <- data.frame(iA_seq, predict_runoff(iA_seq, 182)) 
+view(predict_runoff_df)
+```
+
+```{r}
+ggplot(data = predict_runoff_df, aes(x = iA_seq, y = predict_runoff.iA_seq..182.)) + geom_point() + geom_line() + labs(x = "impervious fraction of watershed", y = "stormwater runoff volume (cubic feet)")
+
+```
+
+```{r}
+ggsave("watershedplot.png")
+```
+
